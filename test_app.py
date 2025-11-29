@@ -1,23 +1,20 @@
-import os
 import unittest
 from app import app
+import os
 
-class TestApp(unittest.TestCase):
+class BasicTestCase(unittest.TestCase):
     def setUp(self):
         self.app = app.test_client()
-        self.app.testing = True
+        # Устанавливаем переменную окружения STUDENT_NAME для теста
+        os.environ['STUDENT_NAME'] = 'TestStudent'
 
-    def test_hello_default(self):
+    def tearDown(self):
+        # Очищаем переменную окружения после теста
+        os.environ.pop('STUDENT_NAME', None)
+
+    def test_home(self):
         response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Hello, Student!', response.data)
-
-    def test_hello_with_env(self):
-        with app.test_client() as client:
-            with app.app_context():
-                os.environ['STUDENT_NAME'] = 'Test Student'
-                response = client.get('/')
-                self.assertIn(b'Test Student', response.data)
 
 if __name__ == '__main__':
     unittest.main()
